@@ -16,7 +16,7 @@ Resources:
       - x86_64
       MemorySize: 128
       Timeout: 100
-      Description: A simple example includes a HTTP get method to get all items from
+      Description: A simple dwexample includes a HTTP get method to get all items from
         a DynamoDB table.
       Environment:
         Variables:
