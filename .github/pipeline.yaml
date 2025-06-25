@@ -17,9 +17,6 @@ env:
   PROD_STACK_NAME: todo-app-prod
   # Región donde desplegar la infraestructura de producción
   PROD_REGION: us-east-1
-  # ARN del rol "LabRole" del laboratorio de AWS
-  # Utilizado por las funciones Lambda (backend) para poder acceder a la base de datos
-  LAB_ROLE_ARN: ${{ vars.LAB_ROLE_ARN }}
 
 permissions:
   id-token: write
@@ -69,7 +66,8 @@ jobs:
         run: |
           sam package \
             --region ${TESTING_REGION} \
-            --output-template-file packaged-testing.yaml
+            --output-template-file packaged-testing.yaml \
+            --resolve-s3
 
       - name: Almacenar plantilla de testeo compilada para el siguiente paso
         uses: actions/upload-artifact@v4
@@ -81,7 +79,8 @@ jobs:
         run: |
           sam package \
             --region ${PROD_REGION} \
-            --output-template-file packaged-prod.yaml
+            --output-template-file packaged-prod.yaml \
+            --resolve-s3
 
       - name: Almacenar plantilla de producción compilada para el siguiente paso
         uses: actions/upload-artifact@v4
@@ -120,7 +119,6 @@ jobs:
             --capabilities CAPABILITY_IAM \
             --region ${TESTING_REGION} \
             --no-fail-on-empty-changeset \
-            --parameter-overrides "LabRoleArn=${LAB_ROLE_ARN}"
       - name: Obtener URL de la API desplegada para almacenarla en el paso posterior
         id: GetUrl
         run: |
@@ -180,7 +178,6 @@ jobs:
             --capabilities CAPABILITY_IAM \
             --region ${PROD_REGION} \
             --no-fail-on-empty-changeset \
-            --parameter-overrides "LabRoleArn=${LAB_ROLE_ARN}"
 
       - name: Borrar infraestructura de test
         run: |
